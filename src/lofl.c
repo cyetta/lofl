@@ -8,22 +8,18 @@
 
 #define MAX_LEVEL_RECURSE 30
 
+/*
+Print error message to stderr
+*/
 int ft_error(int error_code, const char *error_message, const char *error_ext)
 {
 	fprintf(stderr, error_message, error_ext);
 	return (error_code);
 }
 
-void tab_space(int quantity)
-{
-	int i;
-
-	for (i = 0; i < quantity; i++)
-		putchar(' ');
-}
-
 /*
-Print file in folder current_path, level
+Prints recursive tree of file and folder by current_path
+level - counter nesting folders, sets to 0 while calling
 */
 int print_dir(const char *current_path, int level)
 {
@@ -33,6 +29,7 @@ int print_dir(const char *current_path, int level)
 	char *full_path;
 	char *base_path;
 
+	// Checks input variable
 	if (!current_path)
 		return (0);
 	if (level > MAX_LEVEL_RECURSE)
@@ -44,7 +41,6 @@ int print_dir(const char *current_path, int level)
 		base_path = ft_strjoin(current_path, "/");
 	else
 		base_path = ft_strdup(current_path);
-
 	while (1)
 	{
 		errno = 0;
@@ -55,6 +51,7 @@ int print_dir(const char *current_path, int level)
 			continue;
 		full_path = ft_strjoin(base_path, dir_entry->d_name);
 		stat(full_path, &entry_stat);
+		// If the folder is read, calls itself with the name of the subfolder
 		if (S_ISDIR(entry_stat.st_mode))
 		{
 			printf("[D] %*s%s\n", level, "", dir_entry->d_name);
@@ -62,10 +59,8 @@ int print_dir(const char *current_path, int level)
 		}
 		else
 			printf("[ ] %*s%s\n", level, "", dir_entry->d_name);
-
 		free(full_path);
 	}
-
 	if (errno != 0)
 		exit(ft_error(-1, "Fatal error read directory %s", current_path));
 	free(base_path);
